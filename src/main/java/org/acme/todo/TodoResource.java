@@ -2,7 +2,10 @@ package org.acme.todo;
 
 import java.util.List;
 
+import org.acme.todo.dto.TodoRequest;
+
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -29,7 +32,12 @@ public class TodoResource {
     }
 
     @POST
-    public Response create(Todo todo) {
+    public Response create(@Valid TodoRequest todoRequest) {
+
+        Todo todo = new Todo();
+        todo.title = todoRequest.title;
+        todo.completed = todoRequest.completed;
+
         Todo created = service.create(todo);
         return Response.status(Response.Status.CREATED).entity(created).build();
     }
@@ -46,8 +54,16 @@ public class TodoResource {
 
     @PUT
     @Path("/{id}")
-    public Todo update(@PathParam("id") Long id, Todo newData) {
-        Todo updated = service.update(id, newData);
+    public Todo update(@PathParam("id") Long id, @Valid TodoRequest todoRequest) {
+        Todo existing = service.findById(id);
+        if (existing == null) {
+            throw new NotFoundException("Todo not found");
+        }
+
+        existing.title = todoRequest.title;
+        existing.completed = todoRequest.completed;
+
+        Todo updated = service.update(id, existing);
         if (updated == null) {
             throw new NotFoundException("Todo not found");
         }

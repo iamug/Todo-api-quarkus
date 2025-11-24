@@ -1,12 +1,10 @@
-package org.acme.todo;
+package org.acme.todo.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class Todo {
+public class TodoRequest {
 
-    public Long id;
-
-    @NotBlank(message = "title is required")
+    @NotBlank(message = "Title cannot be blank")
     public String title;
 
     public boolean completed;
